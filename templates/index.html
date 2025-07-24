@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Credit Card Fraud Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        form {
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input, button {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .submit-btn {
+            grid-column: span 4;
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f8ff;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+        }
+        .shap-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .batch-results {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .fraud {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .legit {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .info-note {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        .feature-inputs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Credit Card Fraud Detection System</h1>
+    
+    <div class="info-note">
+        <strong>Note:</strong> V1-V28 are PCA-transformed features. In production, these would be derived from raw transaction data.
+    </div>
+
+    <h2>Single Transaction Prediction</h2>
+    <form method="POST" action="/predict">
+        <div class="feature-inputs">
+            <label>Time (seconds since first transaction)</label>
+            <input type="number" name="Time" required step="any" placeholder="e.g., 0">
+            
+            <label>Amount (USD)</label>
+            <input type="number" name="Amount" required step="any" placeholder="e.g., 149.62">
+            
+            {% for i in range(1, 29) %}
+                <label>V{{i}}</label>
+                <input type="number" name="V{{i}}" required step="any" placeholder="PCA feature {{i}}">
+            {% endfor %}
+        </div>
+        <button class="submit-btn" type="submit">Predict Transaction</button>
+    </form>
+
+    {% if prediction_text %}
+        <div class="result">
+            <h3>Prediction Result:</h3>
+            {% if 'FRAUD' in prediction_text %}
+                <p class="fraud">{{ prediction_text }}</p>
+            {% else %}
+                <p class="legit">{{ prediction_text }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if shap_plot and show_shap %}
+        <div class="shap-container">
+            <h3>Explanation</h3>
+            {{ shap_plot|safe }}
+            <p>Features pushing toward <span class="fraud">fraud</span> (red) vs. <span class="legit">legitimate</span> (blue).</p>
+        </div>
+    {% endif %}
+
+    <h2>Batch Prediction</h2>
+    <form method="POST" action="/batch_predict" enctype="multipart/form-data">
+        <input type="file" name="csv_file" accept=".csv" required>
+        <button class="submit-btn" type="submit">Upload CSV</button>
+    </form>
+
+    {% if batch_results %}
+        <div class="result">
+            <h3>Batch Results:</h3>
+            <div class="batch-results">
+                {{ batch_results|safe }}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="info-note">
+        <h4>Sample CSV Format:</h4>
+        <p>Your CSV should contain these columns: <code>Time, V1-V28, Amount</code></p>
+        <p><a href="/static/sample_fraud.csv" download>Download sample CSV</a></p>
+    </div>
+
+    <!-- ✅ SHAP JS for interactive force plot -->
+    <script src="https://cdn.jsdelivr.net/npm/shap@latest/es5.bundle.min.js"></script>
+</body>
+</html>

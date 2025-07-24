@@ -1,0 +1,10 @@
+# Python
+fraud_detection_venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Other common ignores
+.DS_Store
+.env
+.vscode/
