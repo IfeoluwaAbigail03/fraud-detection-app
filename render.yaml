@@ -1,5 +1,0 @@
-services:
-  - type: web
-    name: fraud-detection-app
-    runtime: python
-    pythonVersion: "3.10.0"
