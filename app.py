@@ -2,12 +2,13 @@ from flask import Flask, request, render_template, jsonify
 import joblib
 import numpy as np
 import pandas as pd
-import shap
-import matplotlib
-matplotlib.use('Agg')  # Use non-GUI backend
-import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
+import shap
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
+
 
 app = Flask(__name__)
 
@@ -34,6 +35,7 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    
     try:
         # Collect input data from form
         input_data = {
