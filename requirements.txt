@@ -1,11 +1,10 @@
---python-version 3.10
 Flask==2.2.5
 gunicorn==20.1.0
-scikit-learn==1.2.2 ; python_version < '3.12'  # Only install if Python < 3.12
-numpy==1.23.5  # Must match scikit-learn 1.2.2
+scikit-learn==1.2.2 ; python_version < '3.12'
+numpy==1.23.5
 pandas==1.5.3
 shap==0.41.0
 matplotlib==3.6.3
 joblib==1.2.0
 Werkzeug==2.2.3
---only-binary :all:  # Must be LAST line
+--only-binary :all:  # Must be last line
